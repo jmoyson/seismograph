@@ -11,7 +11,7 @@ services:
     volumes:
       - pgdata:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-seismo}"]
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-seismo} -d ${DB_NAME:-seismograph}"]
       interval: 10s
       timeout: 5s
       retries: 5
