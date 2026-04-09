@@ -47,7 +47,7 @@ services:
       REDIS_HOST: redis
       REDIS_PORT: 6379
       USGS_FEED_URL: https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/2.5_hour.geojson
-      USGS_SEED_URL: https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/2.5_week.geojson
+      USGS_SEED_URL: https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/2.5_month.geojson
       PORT: 3000
 
   web:

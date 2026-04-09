@@ -38,7 +38,7 @@ export class SyncEarthquakesService {
   }
 
   async seedHistory(): Promise<void> {
-    this.logger.log('Seeding earthquake history (7 days)...');
+    this.logger.log('Seeding earthquake history (30 days)...');
     const features = await this.usgsFeed.fetchWeekly();
 
     if (features.length === 0) return;
