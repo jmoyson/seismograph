@@ -49,13 +49,15 @@ services:
       USGS_FEED_URL: https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/2.5_hour.geojson
       USGS_SEED_URL: https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/2.5_month.geojson
       PORT: 3000
+    expose:
+      - "3000"
 
   web:
     build:
       context: .
       dockerfile: apps/web/Dockerfile
       args:
-        VITE_API_URL: /api
+        VITE_API_URL: https://api.seismograph.jmoyson.cloud/api
     restart: unless-stopped
     depends_on:
       - api
