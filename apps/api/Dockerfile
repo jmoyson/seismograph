@@ -15,7 +15,7 @@ RUN cd apps/api && npx prisma generate
 RUN pnpm --filter api build
 
 # Deploy creates a self-contained directory with resolved dependencies
-RUN pnpm --filter api deploy /app/deployed --prod
+RUN pnpm --filter api deploy /app/deployed --prod --legacy
 RUN cp -r /app/apps/api/dist /app/deployed/dist
 
 FROM node:20-alpine AS runner
