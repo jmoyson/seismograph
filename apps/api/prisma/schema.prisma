@@ -1,0 +1,27 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Earthquake {
+  id           String   @id
+  magnitude    Float
+  place        String
+  time         DateTime
+  latitude     Float
+  longitude    Float
+  depth        Float
+  tsunami      Boolean?
+  url          String?
+  status       String?
+  significance Float?
+
+  syncedAt     DateTime @default(now())
+
+  @@index([significance])
+  @@index([time])
+  @@map("earthquakes")
+}
