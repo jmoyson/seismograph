@@ -1,6 +1,7 @@
 import { useRef, useMemo, useCallback } from 'react';
 import GlobeGL from 'react-globe.gl';
-import { getColorByMagnitude, getSizeByMagnitude, getAltByMagnitude } from './globe.utils';
+import { getColorByMagnitude } from '../../shared/utils/formatting';
+import { getSizeByMagnitude, getAltByMagnitude } from './globe.utils';
 import type { Earthquake } from '@seismograph/shared';
 
 interface GlobeProps {
