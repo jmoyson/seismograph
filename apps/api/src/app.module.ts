@@ -9,6 +9,7 @@ import { ListEarthquakesModule } from './features/list-earthquakes/list-earthqua
 import { GetEarthquakeModule } from './features/get-earthquake/get-earthquake.module';
 import { EarthquakeEventsModule } from './features/earthquake-events/earthquake-events.module';
 import { GetStatisticsModule } from './features/get-statistics/get-statistics.module';
+import { AlertEarthquakesModule } from './features/alert-earthquakes/alert-earthquakes.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { GetStatisticsModule } from './features/get-statistics/get-statistics.mo
     GetEarthquakeModule,
     EarthquakeEventsModule,
     GetStatisticsModule,
+    AlertEarthquakesModule,
   ],
 })
 export class AppModule {}
