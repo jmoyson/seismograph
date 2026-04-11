@@ -60,6 +60,57 @@ services:
     expose:
       - "80"
 
+  # Custom Apache Superset image with the @seismograph/superset-plugins
+  # package compiled into the frontend. The webpack build needs ~8 GB of
+  # heap, which is more than our shared Dokploy host can spare without
+  # OOM-killing prod containers. So the image is built by GitHub Actions
+  # (.github/workflows/build-superset-image.yml) and pushed to GHCR.
+  # Dokploy just runs `docker compose pull && docker compose up -d`.
+  #
+  # The `build:` block is kept as a local-dev fallback: running
+  # `docker compose build superset` on a beefy laptop still works and
+  # tags the result with the same image name, so a subsequent `up` uses it.
+  superset:
+    image: ${SUPERSET_IMAGE:-ghcr.io/jmoyson/seismograph-superset:latest}
+    build:
+      context: .
+      dockerfile: docker/superset/Dockerfile
+      args:
+        SUPERSET_VERSION: ${SUPERSET_VERSION:-6.0.0}
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      SUPERSET_SECRET_KEY: ${SUPERSET_SECRET_KEY:?SUPERSET_SECRET_KEY required}
+      SUPERSET_ADMIN_USERNAME: ${SUPERSET_ADMIN_USERNAME:-admin}
+      SUPERSET_ADMIN_PASSWORD: ${SUPERSET_ADMIN_PASSWORD:?SUPERSET_ADMIN_PASSWORD required}
+      SUPERSET_ADMIN_EMAIL: ${SUPERSET_ADMIN_EMAIL:-admin@seismograph.local}
+      DATABASE_HOST: postgres
+      DATABASE_PORT: 5432
+      DATABASE_USER: ${DB_USER:-seismo}
+      DATABASE_PASSWORD: ${DB_PASSWORD}
+      DATABASE_DB: ${DB_NAME:-seismograph}
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+    ports:
+      - "8088:8088"
+    volumes:
+      - superset_home:/app/superset_home
+    healthcheck:
+      test:
+        - "CMD"
+        - "python"
+        - "-c"
+        - "import urllib.request; urllib.request.urlopen('http://localhost:8088/health').read()"
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 90s
+
 volumes:
   pgdata:
   redisdata:
+  superset_home:
