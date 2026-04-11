@@ -65,18 +65,19 @@ services:
   # heap, which is more than our shared Dokploy host can spare without
   # OOM-killing prod containers. So the image is built by GitHub Actions
   # (.github/workflows/build-superset-image.yml) and pushed to GHCR.
-  # Dokploy just runs `docker compose pull && docker compose up -d`.
   #
-  # The `build:` block is kept as a local-dev fallback: running
-  # `docker compose build superset` on a beefy laptop still works and
-  # tags the result with the same image name, so a subsequent `up` uses it.
+  # NO `build:` block here on purpose. Dokploy interprets the presence of
+  # `build:` as "build this from source" and ignores `image:` for pull
+  # decisions, which silently bypassed GHA on the first deploy. The only
+  # supported flow on Dokploy is `docker compose pull && docker compose
+  # up -d`. For the rare case of needing to rebuild locally, use:
+  #
+  #     docker build -f docker/superset/Dockerfile \
+  #       -t ghcr.io/jmoyson/seismograph-superset:latest .
+  #
+  # See docker/superset/README.md for the full runbook.
   superset:
     image: ${SUPERSET_IMAGE:-ghcr.io/jmoyson/seismograph-superset:latest}
-    build:
-      context: .
-      dockerfile: docker/superset/Dockerfile
-      args:
-        SUPERSET_VERSION: ${SUPERSET_VERSION:-6.0.0}
     restart: unless-stopped
     depends_on:
       postgres:
