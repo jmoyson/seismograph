@@ -1,0 +1,35 @@
+{
+  "name": "@seismograph/superset-plugins",
+  "version": "0.0.1",
+  "private": true,
+  "description": "Custom Apache Superset visualization plugins for Seismograph (Globe 3D, Magnitude Pulse Timeline).",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "files": [
+    "lib",
+    "src"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "dev": "tsc -p tsconfig.json --watch",
+    "clean": "rm -rf lib"
+  },
+  "dependencies": {
+    "react-globe.gl": "^2.37.1",
+    "three": "^0.183.2"
+  },
+  "peerDependencies": {
+    "@superset-ui/chart-controls": ">=0.18.0",
+    "@superset-ui/core": ">=0.18.0",
+    "react": "^17.0.0 || ^18.0.0 || ^19.0.0",
+    "react-dom": "^17.0.0 || ^18.0.0 || ^19.0.0"
+  },
+  "devDependencies": {
+    "@superset-ui/chart-controls": "^0.20.0",
+    "@superset-ui/core": "^0.20.0",
+    "@types/react": "^19.2.14",
+    "@types/three": "^0.183.1",
+    "react": "^19.2.4",
+    "typescript": "~6.0.2"
+  }
+}

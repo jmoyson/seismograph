@@ -1,0 +1,43 @@
+# Keep the Docker build context small and cache-friendly. The custom
+# Superset Dockerfile only needs apps/superset-plugins/ and docker/superset/,
+# so most of the repo is dead weight at build time and worse, busts caches.
+
+# VCS
+.git
+.gitignore
+.github
+
+# Node / pnpm
+**/node_modules
+**/.pnpm-store
+pnpm-lock.yaml
+
+# Build outputs
+**/dist
+**/build
+**/lib
+**/.next
+**/.turbo
+
+# Editor / OS
+.vscode
+.idea
+.DS_Store
+*.swp
+
+# Tests / coverage
+**/coverage
+**/.nyc_output
+**/test-results
+
+# Docs / project files unrelated to the Superset image
+docs
+README.md
+*.md
+!docker/superset/README.md
+!apps/superset-plugins/README.md
+
+# Claude / agent state
+.claude
+CLAUDE.md
+**/CLAUDE.md
