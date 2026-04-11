@@ -8,9 +8,12 @@
 .github
 
 # Node / pnpm
+# DO NOT exclude pnpm-lock.yaml: apps/api/Dockerfile and apps/web/Dockerfile
+# both `COPY pnpm-lock.yaml` for `pnpm install --frozen-lockfile`. The custom
+# Superset Dockerfile in docker/superset/ uses plain npm and ignores it, so
+# keeping the file in the build context is harmless there.
 **/node_modules
 **/.pnpm-store
-pnpm-lock.yaml
 
 # Build outputs
 **/dist
