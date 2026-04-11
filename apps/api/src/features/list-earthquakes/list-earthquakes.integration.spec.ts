@@ -24,15 +24,17 @@ describe('list-earthquakes (integration)', () => {
     await moduleRef.close();
   });
 
-  async function seed(partial: Partial<{
-    id: string;
-    magnitude: number;
-    place: string;
-    time: Date;
-    latitude: number;
-    longitude: number;
-    depth: number;
-  }> = {}) {
+  async function seed(
+    partial: Partial<{
+      id: string;
+      magnitude: number;
+      place: string;
+      time: Date;
+      latitude: number;
+      longitude: number;
+      depth: number;
+    }> = {},
+  ) {
     return prisma.earthquake.create({
       data: {
         id: partial.id ?? `eq-${Math.random().toString(36).slice(2)}`,

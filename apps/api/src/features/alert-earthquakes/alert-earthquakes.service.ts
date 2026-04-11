@@ -15,7 +15,9 @@ export class AlertEarthquakesService {
   private readonly logger = new Logger(AlertEarthquakesService.name);
 
   handleSyncedBatch(payload: SyncedBatchPayload): number {
-    const alerts = payload.earthquakes.filter((e) => e.magnitude >= ALERT_THRESHOLD);
+    const alerts = payload.earthquakes.filter(
+      (e) => e.magnitude >= ALERT_THRESHOLD,
+    );
 
     for (const eq of alerts) {
       this.logger.warn(

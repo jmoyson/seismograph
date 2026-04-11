@@ -1,12 +1,17 @@
 import { Module } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { Test, TestingModule } from '@nestjs/testing';
+import { SSEEvent } from '@seismograph/shared';
 import { SyncEarthquakesService } from './sync-earthquakes.service';
 import { UsgsFeedClient, UsgsFeature } from './usgs-feed.client';
 import { PrismaService } from '../../shared/database/prisma.service';
 import { DatabaseModule } from '../../shared/database/database.module';
 import { EventsModule } from '../../shared/events/events.module';
-import { startTestDatabase, cleanDb, assertNotProduction } from '../../../test/helpers/test-db';
+import {
+  startTestDatabase,
+  cleanDb,
+  assertNotProduction,
+} from '../../../test/helpers/test-db';
 
 class UsgsFeedClientMock {
   public fetchHourly = jest.fn<() => Promise<UsgsFeature[]>>();
@@ -18,11 +23,19 @@ class UsgsFeedClientMock {
  * which depend on BullMQ/Redis. We only exercise the service directly.
  */
 @Module({
-  providers: [SyncEarthquakesService, { provide: UsgsFeedClient, useClass: UsgsFeedClientMock }],
+  providers: [
+    SyncEarthquakesService,
+    { provide: UsgsFeedClient, useClass: UsgsFeedClientMock },
+  ],
 })
 class SyncEarthquakesTestModule {}
 
-function makeFeature(partial: Partial<UsgsFeature['properties']> & { id: string; coordinates?: [number, number, number] }): UsgsFeature {
+function makeFeature(
+  partial: Partial<UsgsFeature['properties']> & {
+    id: string;
+    coordinates?: [number, number, number];
+  },
+): UsgsFeature {
   return {
     id: partial.id,
     properties: {
@@ -60,7 +73,7 @@ describe('sync-earthquakes (integration)', () => {
     service = moduleRef.get(SyncEarthquakesService);
     prisma = moduleRef.get(PrismaService);
     emitter = moduleRef.get(EventEmitter2);
-    usgsMock = moduleRef.get(UsgsFeedClient) as unknown as UsgsFeedClientMock;
+    usgsMock = moduleRef.get(UsgsFeedClient);
   });
 
   beforeEach(async () => {
@@ -85,8 +98,16 @@ describe('sync-earthquakes (integration)', () => {
 
     const rows = await prisma.earthquake.findMany({ orderBy: { id: 'asc' } });
     expect(rows).toHaveLength(2);
-    expect(rows[0]).toMatchObject({ id: 'eq1', magnitude: 5.0, place: 'Place A' });
-    expect(rows[1]).toMatchObject({ id: 'eq2', magnitude: 3.2, place: 'Place B' });
+    expect(rows[0]).toMatchObject({
+      id: 'eq1',
+      magnitude: 5.0,
+      place: 'Place A',
+    });
+    expect(rows[1]).toMatchObject({
+      id: 'eq2',
+      magnitude: 3.2,
+      place: 'Place B',
+    });
   });
 
   it('updates existing earthquakes instead of duplicating them', async () => {
@@ -122,8 +143,10 @@ describe('sync-earthquakes (integration)', () => {
       makeFeature({ id: 'eq3', mag: 5.0, time: now }),
     ]);
 
-    const payloads: any[] = [];
-    emitter.on('earthquakes.synced', (payload) => payloads.push(payload));
+    const payloads: SSEEvent[] = [];
+    emitter.on('earthquakes.synced', (payload: SSEEvent) =>
+      payloads.push(payload),
+    );
 
     await service.syncRecent();
 
@@ -139,8 +162,10 @@ describe('sync-earthquakes (integration)', () => {
   it('is a no-op when USGS returns zero features', async () => {
     usgsMock.fetchHourly.mockResolvedValue([]);
 
-    const payloads: any[] = [];
-    emitter.on('earthquakes.synced', (payload) => payloads.push(payload));
+    const payloads: SSEEvent[] = [];
+    emitter.on('earthquakes.synced', (payload: SSEEvent) =>
+      payloads.push(payload),
+    );
 
     const result = await service.syncRecent();
 

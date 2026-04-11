@@ -27,11 +27,52 @@ describe('get-statistics (integration)', () => {
     const now = new Date();
     await prisma.earthquake.createMany({
       data: [
-        { id: 'a', magnitude: 2.5, place: 'p', time: now, latitude: 0, longitude: 0, depth: 5 },
-        { id: 'b', magnitude: 3.8, place: 'p', time: now, latitude: 0, longitude: 0, depth: 5 },
-        { id: 'c', magnitude: 4.2, place: 'p', time: now, latitude: 0, longitude: 0, depth: 5 },
-        { id: 'd', magnitude: 5.1, place: 'p', time: now, latitude: 0, longitude: 0, depth: 5, tsunami: true },
-        { id: 'e', magnitude: 6.3, place: 'p', time: now, latitude: 0, longitude: 0, depth: 5 },
+        {
+          id: 'a',
+          magnitude: 2.5,
+          place: 'p',
+          time: now,
+          latitude: 0,
+          longitude: 0,
+          depth: 5,
+        },
+        {
+          id: 'b',
+          magnitude: 3.8,
+          place: 'p',
+          time: now,
+          latitude: 0,
+          longitude: 0,
+          depth: 5,
+        },
+        {
+          id: 'c',
+          magnitude: 4.2,
+          place: 'p',
+          time: now,
+          latitude: 0,
+          longitude: 0,
+          depth: 5,
+        },
+        {
+          id: 'd',
+          magnitude: 5.1,
+          place: 'p',
+          time: now,
+          latitude: 0,
+          longitude: 0,
+          depth: 5,
+          tsunami: true,
+        },
+        {
+          id: 'e',
+          magnitude: 6.3,
+          place: 'p',
+          time: now,
+          latitude: 0,
+          longitude: 0,
+          depth: 5,
+        },
       ],
     });
   }
@@ -42,7 +83,10 @@ describe('get-statistics (integration)', () => {
     const stats = await service.getStats(7);
 
     expect(stats.totalCount).toBe(5);
-    expect(stats.avgMagnitude).toBeCloseTo((2.5 + 3.8 + 4.2 + 5.1 + 6.3) / 5, 1);
+    expect(stats.avgMagnitude).toBeCloseTo(
+      (2.5 + 3.8 + 4.2 + 5.1 + 6.3) / 5,
+      1,
+    );
     expect(stats.maxMagnitude).toBe(6.3);
     expect(stats.minMagnitude).toBe(2.5);
   });
@@ -78,8 +122,24 @@ describe('get-statistics (integration)', () => {
 
     await prisma.earthquake.createMany({
       data: [
-        { id: 'recent', magnitude: 4.0, place: 'p', time: now, latitude: 0, longitude: 0, depth: 5 },
-        { id: 'old', magnitude: 8.0, place: 'p', time: old, latitude: 0, longitude: 0, depth: 5 },
+        {
+          id: 'recent',
+          magnitude: 4.0,
+          place: 'p',
+          time: now,
+          latitude: 0,
+          longitude: 0,
+          depth: 5,
+        },
+        {
+          id: 'old',
+          magnitude: 8.0,
+          place: 'p',
+          time: old,
+          latitude: 0,
+          longitude: 0,
+          depth: 5,
+        },
       ],
     });
 

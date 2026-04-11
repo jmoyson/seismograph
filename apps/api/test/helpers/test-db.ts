@@ -1,6 +1,6 @@
 import { DynamicModule } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
-import { PostgreSqlContainer, StartedPostgreSqlContainer } from '@testcontainers/postgresql';
+import { PostgreSqlContainer } from '@testcontainers/postgresql';
 import { execSync } from 'node:child_process';
 import * as path from 'node:path';
 import { PrismaService } from '../../src/shared/database/prisma.service';
@@ -18,7 +18,6 @@ export function assertNotProduction(): void {
   }
 }
 
-let sharedContainer: StartedPostgreSqlContainer | undefined;
 let sharedUrl: string | undefined;
 
 export async function startTestDatabase(): Promise<string> {
@@ -43,18 +42,16 @@ export async function startTestDatabase(): Promise<string> {
     .withReuse()
     .start();
 
-  sharedContainer = container;
   sharedUrl = container.getConnectionUri();
   assertNotProduction();
   applyPrismaSchema(sharedUrl);
   return sharedUrl;
 }
 
-export async function stopTestDatabase(): Promise<void> {
+export function stopTestDatabase(): void {
   // With `.withReuse()`, Testcontainers' Ryuk keeps the container alive across test runs.
   // We intentionally don't call stop() here — letting the container survive gives instant restarts.
   // In CI, there's no local container to stop (we use the GH Actions sidecar).
-  sharedContainer = undefined;
   sharedUrl = undefined;
 }
 

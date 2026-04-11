@@ -43,7 +43,8 @@ export class UsgsFeedClient {
       this.logger.log(`Fetched ${data.metadata.count} earthquakes from USGS`);
       return data.features;
     } catch (error) {
-      this.logger.error(`USGS feed error: ${error.message}`);
+      const message = error instanceof Error ? error.message : String(error);
+      this.logger.error(`USGS feed error: ${message}`);
       throw error;
     }
   }

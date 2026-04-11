@@ -7,7 +7,9 @@ export class AlertEarthquakesListener {
   constructor(private readonly service: AlertEarthquakesService) {}
 
   @OnEvent('earthquakes.synced')
-  handleSynced(payload: Parameters<AlertEarthquakesService['handleSyncedBatch']>[0]): void {
+  handleSynced(
+    payload: Parameters<AlertEarthquakesService['handleSyncedBatch']>[0],
+  ): void {
     this.service.handleSyncedBatch(payload);
   }
 }

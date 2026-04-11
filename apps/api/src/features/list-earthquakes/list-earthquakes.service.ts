@@ -14,7 +14,7 @@ export class ListEarthquakesService {
       [SortBy.MAGNITUDE]: 'magnitude',
       [SortBy.SIGNIFICANCE]: 'significance',
       [SortBy.TIME]: 'time',
-    }[filters.sortBy || SortBy.TIME] as string;
+    }[filters.sortBy || SortBy.TIME];
 
     return this.prisma.earthquake.findMany({
       where: {

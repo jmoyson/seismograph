@@ -17,7 +17,8 @@ export class SyncEarthquakesProcessor extends WorkerHost {
       const result = await this.syncService.syncRecent();
       this.logger.log(`Job ${job.id} done: ${result.synced} synced`);
     } catch (error) {
-      this.logger.error(`Job ${job.id} failed: ${error.message}`);
+      const message = error instanceof Error ? error.message : String(error);
+      this.logger.error(`Job ${job.id} failed: ${message}`);
       throw error;
     }
   }
