@@ -1,0 +1,86 @@
+name: Build Superset image
+
+# Builds the custom Apache Superset image with our @seismograph/superset-plugins
+# compiled into the frontend, and pushes it to GHCR. The Dokploy host then
+# pulls this pre-built image instead of building locally — the Superset
+# frontend webpack needs ~8 GB of heap which our 8 GB shared VPS cannot
+# spare without OOM-killing prod containers.
+#
+# Triggered on pushes to main that touch the plugin source, the Dockerfile,
+# or this workflow itself, plus manual dispatch from the Actions UI.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "apps/superset-plugins/**"
+      - "docker/superset/**"
+      - ".github/workflows/build-superset-image.yml"
+  workflow_dispatch:
+    inputs:
+      superset_version:
+        description: "Apache Superset git tag to build against (e.g. 6.0.0). Must match a published apache/superset:<tag> image."
+        required: false
+        default: "6.0.0"
+
+concurrency:
+  group: build-superset-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  build:
+    name: Build & push to GHCR
+    runs-on: ubuntu-latest
+    env:
+      REGISTRY: ghcr.io
+      IMAGE_NAME: ${{ github.repository_owner }}/seismograph-superset
+      SUPERSET_VERSION: ${{ inputs.superset_version || '6.0.0' }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Compute image tags
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=raw,value=latest,enable={{is_default_branch}}
+            type=raw,value=superset-${{ env.SUPERSET_VERSION }}
+            type=sha,format=short
+          labels: |
+            org.opencontainers.image.title=Seismograph Superset
+            org.opencontainers.image.description=Apache Superset ${{ env.SUPERSET_VERSION }} with @seismograph/superset-plugins compiled in.
+            org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
+
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: docker/superset/Dockerfile
+          platforms: linux/amd64
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          build-args: |
+            SUPERSET_VERSION=${{ env.SUPERSET_VERSION }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Report image digest
+        run: |
+          echo "Pushed tags:"
+          echo "${{ steps.meta.outputs.tags }}"
