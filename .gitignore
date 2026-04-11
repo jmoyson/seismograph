@@ -7,3 +7,6 @@ build
 coverage
 .turbo
 generated
+
+# Claude Code per-user local state (tool permissions, session cache)
+.claude/
