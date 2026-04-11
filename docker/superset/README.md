@@ -78,14 +78,26 @@ To bump from `6.0.0` → `6.x.y`:
 
 ## Local rebuild (rarely needed)
 
-The compose file keeps `build:` next to `image:` as a fallback so a beefy
-laptop can still rebuild the image without going through GHA:
+The compose file deliberately does NOT include a `build:` block for the
+`superset` service. Dokploy interprets `build:` as "build this from source"
+and ignores `image:` for pull decisions, which silently bypassed GHA on the
+first deploy and tried to compile Superset on the 8 GB shared VPS.
+
+If you need to rebuild the image yourself (e.g. while iterating on
+`register-plugins.js` against a new Superset tag), build it directly with
+the docker CLI from the repo root:
 
 ```
-docker compose build superset
+docker build \
+  -f docker/superset/Dockerfile \
+  -t ghcr.io/jmoyson/seismograph-superset:latest \
+  --build-arg SUPERSET_VERSION=6.0.0 \
+  .
+
 docker compose up -d superset
 ```
 
-This needs the laptop's Docker daemon to have ≥10 GB of RAM allocated
-(Docker Desktop default is 4 GB — won't work). Mostly useful when iterating
-on `register-plugins.js` against a new Superset tag.
+This needs the local Docker daemon to have ≥10 GB of RAM allocated
+(Docker Desktop default is 4 GB — won't work). The compose `up -d` will
+then use the locally built image because it's tagged with the same name
+as the GHCR pull target.
