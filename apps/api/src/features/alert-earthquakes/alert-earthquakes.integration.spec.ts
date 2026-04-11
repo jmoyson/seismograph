@@ -9,7 +9,7 @@ describe('alert-earthquakes (integration)', () => {
   let moduleRef: TestingModule;
   let service: AlertEarthquakesService;
   let emitter: EventEmitter2;
-  let warnSpy: jest.SpyInstance;
+  let warnSpy: jest.SpyInstance<void, [unknown, ...unknown[]]>;
 
   beforeAll(async () => {
     moduleRef = await createTestingModule(AlertEarthquakesModule);
@@ -34,9 +34,45 @@ describe('alert-earthquakes (integration)', () => {
       type: 'sync',
       count: 3,
       earthquakes: [
-        { id: 'low', magnitude: 5.0, place: 'Place A', time: '2026-04-10T12:00:00Z', latitude: 0, longitude: 0, depth: 10, url: 'https://u/low' } as any,
-        { id: 'high', magnitude: 6.5, place: 'Place B', time: '2026-04-10T12:01:00Z', latitude: 0, longitude: 0, depth: 10, url: 'https://u/high' } as any,
-        { id: 'huge', magnitude: 7.8, place: 'Place C', time: '2026-04-10T12:02:00Z', latitude: 0, longitude: 0, depth: 10, url: 'https://u/huge' } as any,
+        {
+          id: 'low',
+          magnitude: 5.0,
+          place: 'Place A',
+          time: '2026-04-10T12:00:00Z',
+          latitude: 0,
+          longitude: 0,
+          depth: 10,
+          url: 'https://u/low',
+          tsunami: false,
+          status: null,
+          significance: null,
+        },
+        {
+          id: 'high',
+          magnitude: 6.5,
+          place: 'Place B',
+          time: '2026-04-10T12:01:00Z',
+          latitude: 0,
+          longitude: 0,
+          depth: 10,
+          url: 'https://u/high',
+          tsunami: false,
+          status: null,
+          significance: null,
+        },
+        {
+          id: 'huge',
+          magnitude: 7.8,
+          place: 'Place C',
+          time: '2026-04-10T12:02:00Z',
+          latitude: 0,
+          longitude: 0,
+          depth: 10,
+          url: 'https://u/huge',
+          tsunami: false,
+          status: null,
+          significance: null,
+        },
       ],
       timestamp: '2026-04-10T12:03:00Z',
     });
@@ -45,8 +81,12 @@ describe('alert-earthquakes (integration)', () => {
     expect(warnSpy).toHaveBeenCalledTimes(2);
     // The warn calls should mention magnitude and place of each alert
     const messages = warnSpy.mock.calls.map((call) => String(call[0]));
-    expect(messages.some((m) => m.includes('6.5') && m.includes('Place B'))).toBe(true);
-    expect(messages.some((m) => m.includes('7.8') && m.includes('Place C'))).toBe(true);
+    expect(
+      messages.some((m) => m.includes('6.5') && m.includes('Place B')),
+    ).toBe(true);
+    expect(
+      messages.some((m) => m.includes('7.8') && m.includes('Place C')),
+    ).toBe(true);
   });
 
   it('emits no warnings when no earthquake is at or above 6.0', () => {
@@ -54,8 +94,32 @@ describe('alert-earthquakes (integration)', () => {
       type: 'sync',
       count: 2,
       earthquakes: [
-        { id: 'low1', magnitude: 3.0, place: 'A', time: '2026-04-10T12:00:00Z', latitude: 0, longitude: 0, depth: 10, url: 'https://u/1' } as any,
-        { id: 'low2', magnitude: 5.9, place: 'B', time: '2026-04-10T12:01:00Z', latitude: 0, longitude: 0, depth: 10, url: 'https://u/2' } as any,
+        {
+          id: 'low1',
+          magnitude: 3.0,
+          place: 'A',
+          time: '2026-04-10T12:00:00Z',
+          latitude: 0,
+          longitude: 0,
+          depth: 10,
+          url: 'https://u/1',
+          tsunami: false,
+          status: null,
+          significance: null,
+        },
+        {
+          id: 'low2',
+          magnitude: 5.9,
+          place: 'B',
+          time: '2026-04-10T12:01:00Z',
+          latitude: 0,
+          longitude: 0,
+          depth: 10,
+          url: 'https://u/2',
+          tsunami: false,
+          status: null,
+          significance: null,
+        },
       ],
       timestamp: '2026-04-10T12:02:00Z',
     });
@@ -69,7 +133,19 @@ describe('alert-earthquakes (integration)', () => {
       type: 'sync',
       count: 1,
       earthquakes: [
-        { id: 'big', magnitude: 6.2, place: 'Big place', time: '2026-04-10T12:00:00Z', latitude: 0, longitude: 0, depth: 10, url: 'https://u/big' } as any,
+        {
+          id: 'big',
+          magnitude: 6.2,
+          place: 'Big place',
+          time: '2026-04-10T12:00:00Z',
+          latitude: 0,
+          longitude: 0,
+          depth: 10,
+          url: 'https://u/big',
+          tsunami: false,
+          status: null,
+          significance: null,
+        },
       ],
       timestamp: '2026-04-10T12:01:00Z',
     });
