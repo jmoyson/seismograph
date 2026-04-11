@@ -7,13 +7,26 @@
     "dev": "pnpm run dev:api & pnpm run dev:web",
     "build:api": "pnpm --filter api build",
     "build:web": "pnpm --filter web build",
-    "build": "pnpm run build:api && pnpm run build:web"
+    "build": "pnpm run build:api && pnpm run build:web",
+    "lint": "pnpm --filter api lint",
+    "test": "pnpm --filter api test",
+    "test:integration": "pnpm --filter api test:integration",
+    "check:slices": "depcruise apps/api/src apps/web/src --config .dependency-cruiser.cjs",
+    "graph:slices": "depcruise apps/api/src apps/web/src --config .dependency-cruiser.cjs --output-type dot | dot -T svg -o docs/dependency-graph.svg"
   },
   "engines": {
     "node": ">=20"
   },
   "packageManager": "pnpm@10.33.0",
   "pnpm": {
-    "onlyBuiltDependencies": ["@nestjs/core", "@prisma/engines", "prisma", "unrs-resolver"]
+    "onlyBuiltDependencies": [
+      "@nestjs/core",
+      "@prisma/engines",
+      "prisma",
+      "unrs-resolver"
+    ]
+  },
+  "devDependencies": {
+    "dependency-cruiser": "^17.3.10"
   }
 }

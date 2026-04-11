@@ -1,4 +1,4 @@
-import { getColorByMagnitude } from '../globe/globe.utils';
+import { getColorByMagnitude } from '../../shared/utils/formatting';
 import type { Earthquake } from '@seismograph/shared';
 
 interface Props {
