@@ -57,11 +57,19 @@ RUN git clone --depth 1 --branch "${SUPERSET_VERSION}" \
       https://github.com/apache/superset.git .
 
 WORKDIR /src/superset-frontend
-RUN npm ci --no-audit --no-fund --legacy-peer-deps
+# IMPORTANT: plain `npm ci`, no `--legacy-peer-deps`. Apache uses bare
+# `npm ci` in their official Dockerfile and Superset's lockfile relies on
+# npm 7+ peer-dep auto-resolution to install transitive peers like
+# @react-spring/web, @deck.gl/widgets, query-string, etc. Adding
+# --legacy-peer-deps disables that behavior and webpack later fails with
+# 19 "Module not found" errors on those exact packages.
+RUN npm ci --no-audit --no-fund
 
-# Drop our compiled plugin into Superset's frontend node_modules.
+# Drop our compiled plugin into Superset's frontend node_modules. Our plugin
+# declares react ^17||^18||^19 as a peer, which Superset 6.0.0 (react 17.0.2)
+# satisfies cleanly — no --legacy-peer-deps needed here either.
 COPY --from=plugin-builder /plugin /tmp/seismograph-plugin
-RUN npm install --no-audit --no-fund --legacy-peer-deps /tmp/seismograph-plugin
+RUN npm install --no-audit --no-fund /tmp/seismograph-plugin
 
 # Patch MainPreset.js to register both plugin classes (idempotent — safe on
 # rebuilds because the script aborts if @seismograph is already imported).
