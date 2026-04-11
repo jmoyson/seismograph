@@ -1,5 +1,5 @@
 export interface PulseEvent {
-  time: string;
+  time: number;
   metric: number;
   colorMetric: number;
   label: string;

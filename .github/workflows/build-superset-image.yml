@@ -6,17 +6,13 @@ name: Build Superset image
 # frontend webpack needs ~8 GB of heap which our 8 GB shared VPS cannot
 # spare without OOM-killing prod containers.
 #
-# Triggered on pushes to main that touch the plugin source, the Dockerfile,
-# or this workflow itself, plus manual dispatch from the Actions UI.
-
+# Triggered ONLY on pushes to main that touch the plugin source, the
+# Dockerfile, or this workflow itself, plus manual dispatch from the Actions
+# UI. We deliberately do not build on pull_request because every build pushes
+# `:latest` to GHCR, and Dokploy pulls `:latest` on every up — a PR build
+# would silently roll out unmerged code to prod.
 on:
   push:
-    branches: [main]
-    paths:
-      - "apps/superset-plugins/**"
-      - "docker/superset/**"
-      - ".github/workflows/build-superset-image.yml"
-  pull_request:
     branches: [main]
     paths:
       - "apps/superset-plugins/**"

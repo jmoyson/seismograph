@@ -7,3 +7,9 @@ build
 coverage
 .turbo
 generated
+
+# Claude Code: track shared bits (settings.json, skills/, commands/, agents/)
+# but ignore per-user state. settings.local.json holds the local tool
+# permission allowlist; projects/ holds session cache.
+.claude/settings.local.json
+.claude/projects/
