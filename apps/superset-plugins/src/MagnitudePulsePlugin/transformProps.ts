@@ -14,14 +14,24 @@ export default function transformProps(chartProps: ChartProps): MagnitudePulsePr
 
   const colorColumn = color_metric_column || metric_column;
 
+  // Superset can hand back temporal columns as either an epoch number, a Date,
+  // or an ISO/SQL string depending on dataset config — normalise once here so
+  // the renderer only ever deals with epoch ms.
+  const toEpoch = (raw: unknown): number => {
+    if (raw == null) return NaN;
+    if (typeof raw === 'number') return raw;
+    if (raw instanceof Date) return raw.getTime();
+    return new Date(String(raw)).getTime();
+  };
+
   const data: PulseEvent[] = rows
     .map((row) => ({
-      time: String(row[time_column] ?? ''),
+      time: toEpoch(row[time_column]),
       metric: Number(row[metric_column]),
       colorMetric: Number(row[colorColumn]),
       label: String(row[label_column] ?? ''),
     }))
-    .filter((event) => event.time && Number.isFinite(event.metric));
+    .filter((event) => Number.isFinite(event.time) && Number.isFinite(event.metric));
 
   return { width, height, data };
 }

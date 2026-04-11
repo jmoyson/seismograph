@@ -50,3 +50,37 @@ CORS_OPTIONS = {
     "resources": ["*"],
     "origins": ["*"],
 }
+
+# The SeismoGlobe plugin loads three-globe's Earth and night-sky textures from
+# unpkg.com at runtime. Superset's default Talisman CSP only allows scarf.sh
+# and document360 in img-src, so the textures get blocked and the globe renders
+# black. Override TALISMAN_CONFIG to whitelist unpkg.com — we copy the rest of
+# Superset's defaults so we don't accidentally loosen anything else.
+TALISMAN_CONFIG = {
+    "content_security_policy": {
+        "base-uri": ["'self'"],
+        "default-src": ["'self'"],
+        "img-src": [
+            "'self'",
+            "blob:",
+            "data:",
+            "https://apachesuperset.gateway.scarf.sh",
+            "https://static.scarf.sh/",
+            "https://ows.terrestris.de",
+            "https://cdn.document360.io",
+            "https://unpkg.com",
+        ],
+        "worker-src": ["'self'", "blob:"],
+        "connect-src": [
+            "'self'",
+            "https://api.mapbox.com",
+            "https://events.mapbox.com",
+        ],
+        "object-src": "'none'",
+        "style-src": ["'self'", "'unsafe-inline'"],
+        "script-src": ["'self'", "'strict-dynamic'"],
+    },
+    "content_security_policy_nonce_in": ["script-src"],
+    "force_https": False,
+    "session_cookie_secure": False,
+}

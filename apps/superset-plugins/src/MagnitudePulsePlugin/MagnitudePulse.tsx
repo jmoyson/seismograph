@@ -3,8 +3,8 @@ import { getColorByMetric } from '../shared/colors';
 import { MagnitudePulseProps } from './types';
 
 const PADDING = { top: 40, right: 40, bottom: 60, left: 40 };
-const MIN_RADIUS = 4;
-const MAX_RADIUS = 40;
+const MIN_RADIUS = 3;
+const MAX_RADIUS = 14;
 
 interface PlottedPoint {
   x: number;
@@ -13,8 +13,21 @@ interface PlottedPoint {
   color: string;
   label: string;
   metric: number;
-  time: string;
+  time: number;
   delay: number;
+}
+
+const DAY_MS = 24 * 60 * 60 * 1000;
+
+function formatTick(epoch: number, spanMs: number): string {
+  const d = new Date(epoch);
+  if (spanMs < DAY_MS) {
+    return d.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+  }
+  if (spanMs < 30 * DAY_MS) {
+    return d.toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' });
+  }
+  return d.toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: '2-digit' });
 }
 
 export default function MagnitudePulse({ width, height, data }: MagnitudePulseProps) {
@@ -25,12 +38,16 @@ export default function MagnitudePulse({ width, height, data }: MagnitudePulsePr
       return { points: [] as PlottedPoint[], timeTicks: [] as { x: number; label: string }[] };
     }
 
-    const times = data.map((d) => new Date(d.time).getTime());
-    const minTime = Math.min(...times);
-    const maxTime = Math.max(...times);
-    const metrics = data.map((d) => d.metric);
-    const minMetric = Math.min(...metrics);
-    const maxMetric = Math.max(...metrics);
+    let minTime = Infinity;
+    let maxTime = -Infinity;
+    let minMetric = Infinity;
+    let maxMetric = -Infinity;
+    for (const d of data) {
+      if (d.time < minTime) minTime = d.time;
+      if (d.time > maxTime) maxTime = d.time;
+      if (d.metric < minMetric) minMetric = d.metric;
+      if (d.metric > maxMetric) maxMetric = d.metric;
+    }
 
     const innerWidth = Math.max(1, width - PADDING.left - PADDING.right);
     const innerHeight = Math.max(1, height - PADDING.top - PADDING.bottom);
@@ -41,10 +58,9 @@ export default function MagnitudePulse({ width, height, data }: MagnitudePulsePr
       PADDING.left + ((t - minTime) / timeRange) * innerWidth;
 
     const points: PlottedPoint[] = data.map((d, i) => {
-      const t = new Date(d.time).getTime();
       const norm = (d.metric - minMetric) / metricRange;
       return {
-        x: timeScale(t),
+        x: timeScale(d.time),
         y: PADDING.top + innerHeight / 2,
         r: MIN_RADIUS + norm * (MAX_RADIUS - MIN_RADIUS),
         color: getColorByMetric(d.colorMetric),
@@ -58,13 +74,7 @@ export default function MagnitudePulse({ width, height, data }: MagnitudePulsePr
     const tickCount = Math.max(2, Math.min(8, Math.floor(width / 120)));
     const timeTicks = Array.from({ length: tickCount }, (_, i) => {
       const t = minTime + (i / (tickCount - 1)) * timeRange;
-      return {
-        x: timeScale(t),
-        label: new Date(t).toLocaleDateString('fr-FR', {
-          day: '2-digit',
-          month: 'short',
-        }),
-      };
+      return { x: timeScale(t), label: formatTick(t, timeRange) };
     });
 
     return { points, timeTicks };
