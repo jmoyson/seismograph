@@ -78,6 +78,11 @@ services:
   # See docker/superset/README.md for the full runbook.
   superset:
     image: ${SUPERSET_IMAGE:-ghcr.io/jmoyson/seismograph-superset:latest}
+    # Always re-pull on `docker compose up` so Dokploy picks up new GHCR
+    # builds without needing an explicit `docker compose pull`. The default
+    # `missing` policy reuses any locally-cached :latest tag, which silently
+    # keeps the old image even after a successful new push.
+    pull_policy: always
     restart: unless-stopped
     depends_on:
       postgres:
