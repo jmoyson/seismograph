@@ -102,6 +102,13 @@ RUN apt-get update \
  && apt-get install -y --no-install-recommends postgresql-client \
  && rm -rf /var/lib/apt/lists/*
 
+# psycopg2-binary: the apache/superset lean preset ships with NO database
+# drivers. We connect to Postgres for both Superset's metadata DB
+# (`superset_meta`) and the Seismograph application DB, so without this the
+# container crashes at boot with `ModuleNotFoundError: No module named
+# 'psycopg2'`. Install via uv into the venv that ships with the base image.
+RUN uv pip install --python /app/.venv/bin/python --no-cache-dir psycopg2-binary
+
 USER superset
 
 ENTRYPOINT ["/app/superset-init.sh"]
