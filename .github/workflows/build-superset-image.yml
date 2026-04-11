@@ -16,6 +16,12 @@ on:
       - "apps/superset-plugins/**"
       - "docker/superset/**"
       - ".github/workflows/build-superset-image.yml"
+  pull_request:
+    branches: [main]
+    paths:
+      - "apps/superset-plugins/**"
+      - "docker/superset/**"
+      - ".github/workflows/build-superset-image.yml"
   workflow_dispatch:
     inputs:
       superset_version:
