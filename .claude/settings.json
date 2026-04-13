@@ -1,0 +1,10 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "type": "command",
+        "command": "bash -c '[ -d \"$HOME/.claude/plugins/cache/claude-plugins-official/superpowers\" ] || echo \"RECOMMENDED: Install the Superpowers plugin for the best development experience on this project. Run: claude plugins add @anthropic/claude-code-superpowers\"'"
+      }
+    ]
+  }
+}
