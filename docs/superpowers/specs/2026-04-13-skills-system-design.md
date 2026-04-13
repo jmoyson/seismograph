@@ -30,6 +30,46 @@ Skills live in `.claude/skills/<name>/SKILL.md` (native Claude Code format). Thi
 
 Skills do NOT chain to each other — shared conventions live in the CLAUDE.md hierarchy (already loaded automatically). Each skill is self-contained.
 
+## Superpowers Plugin Recommendation
+
+The [Superpowers plugin](https://github.com/anthropics/claude-code-superpowers) provides essential workflow skills (brainstorming, TDD, debugging, code review, plan execution) that complement the project-specific skills defined here. It should be strongly recommended to every developer working on this repo.
+
+Three layers of recommendation, from active to passive:
+
+### Layer 1: Session-start hook (active, automatic)
+
+A `SessionStart` hook in `.claude/settings.json` (committed to git, shared with team) checks for the plugin on every session start. If missing, it prints a warning that Claude sees and relays to the user.
+
+```json
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "type": "command",
+        "command": "bash -c '[ -d \"$HOME/.claude/plugins/cache/claude-plugins-official/superpowers\" ] || echo \"RECOMMENDED: Install the Superpowers plugin for the best development experience. Run: claude plugins add @anthropic/claude-code-superpowers\"'"
+      }
+    ]
+  }
+}
+```
+
+This fires before any interaction — zero chance of missing it.
+
+### Layer 2: `/onboard` skill check (contextual)
+
+The `/onboard` skill uses dynamic context injection to detect the plugin and explain *why* it matters:
+
+```markdown
+## Superpowers plugin
+!`[ -d "$HOME/.claude/plugins/cache/claude-plugins-official/superpowers" ] && echo "INSTALLED" || echo "NOT_INSTALLED"`
+```
+
+If not installed, the onboard flow explains: "Superpowers gives you `/brainstorm`, `/tdd`, `/debug`, and `/plan` workflows that pair with this project's `/new`, `/new-plugin`, and `/check` skills."
+
+### Layer 3: Documentation (passive, permanent)
+
+CLAUDE.md and README.md both mention Superpowers as a recommended prerequisite.
+
 ## Directory Structure
 
 ```
@@ -412,6 +452,16 @@ This project has native Claude Code skills in `.claude/skills/`. Available skill
 - `/check` — Verify code correctness with smart remediation
 
 When asked to add a feature, use `/new`. When asked about the project, suggest `/onboard`.
+
+### Recommended plugin: Superpowers
+
+Install the [Superpowers plugin](https://github.com/anthropics/claude-code-superpowers) for brainstorming, TDD, debugging, and plan execution workflows:
+
+\`\`\`bash
+claude plugins add @anthropic/claude-code-superpowers
+\`\`\`
+
+A session-start hook will remind you if it's not installed.
 ```
 
 ## README.md Update
@@ -422,6 +472,16 @@ Add a "Development with Claude Code" section after Quick Start:
 ## Development with Claude Code
 
 This project includes [Claude Code skills](https://docs.anthropic.com/en/docs/claude-code/skills) that encode architecture conventions and automate feature generation.
+
+### Prerequisites
+
+Install the Superpowers plugin (recommended — provides brainstorming, TDD, debugging workflows):
+
+\`\`\`bash
+claude plugins add @anthropic/claude-code-superpowers
+\`\`\`
+
+### Available skills
 
 | Command | What it does |
 |---------|-------------|
@@ -437,16 +497,17 @@ Example: `/new ranking of most active seismic regions` generates shared types, a
 
 | # | File | Action |
 |---|------|--------|
-| 1 | `.claude/skills/onboard/SKILL.md` | Create |
-| 2 | `.claude/skills/new/SKILL.md` | Create |
-| 3 | `.claude/skills/new/reference/slice-templates.md` | Create |
-| 4 | `.claude/skills/new/reference/web-templates.md` | Create |
-| 5 | `.claude/skills/new/reference/plugin-templates.md` | Create |
-| 6 | `.claude/skills/new/reference/shared-types-guide.md` | Create |
-| 7 | `.claude/skills/new-plugin/SKILL.md` | Create |
-| 8 | `.claude/skills/check/SKILL.md` | Create |
-| 9 | `CLAUDE.md` | Modify — add Skills system section |
-| 10 | `README.md` | Modify — add Development with Claude Code section |
+| 1 | `.claude/settings.json` | Create — session-start hook for Superpowers plugin check |
+| 2 | `.claude/skills/onboard/SKILL.md` | Create |
+| 3 | `.claude/skills/new/SKILL.md` | Create |
+| 4 | `.claude/skills/new/reference/slice-templates.md` | Create |
+| 5 | `.claude/skills/new/reference/web-templates.md` | Create |
+| 6 | `.claude/skills/new/reference/plugin-templates.md` | Create |
+| 7 | `.claude/skills/new/reference/shared-types-guide.md` | Create |
+| 8 | `.claude/skills/new-plugin/SKILL.md` | Create |
+| 9 | `.claude/skills/check/SKILL.md` | Create |
+| 10 | `CLAUDE.md` | Modify — add Skills system + Superpowers recommendation |
+| 11 | `README.md` | Modify — add Development with Claude Code section |
 
 ## Verification
 
