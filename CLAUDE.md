@@ -68,3 +68,24 @@ One commit per logical change. Keep the git log readable.
 ## Extension pattern: nested CLAUDE.md
 
 When a slice grows past ~5 files or gains non-trivial internal invariants (ordering rules, idempotency guarantees, non-obvious error semantics), add a `CLAUDE.md` inside the slice itself (e.g., `apps/api/src/features/sync-earthquakes/CLAUDE.md`). Claude Code automatically loads the most specific file for the directory you're working in.
+
+## Skills system
+
+This project has native Claude Code skills in `.claude/skills/`. Available skills:
+
+- `/onboard` — Interactive codebase tour for new developers
+- `/new <description>` — Generate a complete feature across all layers (backend, frontend, shared types)
+- `/new-plugin <description>` — Generate a Superset visualization plugin
+- `/check` — Verify code correctness with smart remediation
+
+When asked to add a feature, use `/new`. When asked about the project, suggest `/onboard`.
+
+### Recommended plugin: Superpowers
+
+Install the [Superpowers plugin](https://github.com/anthropics/claude-code-superpowers) for brainstorming, TDD, debugging, and plan execution workflows:
+
+````bash
+claude plugins add @anthropic/claude-code-superpowers
+````
+
+A session-start hook will remind you if it's not installed.
