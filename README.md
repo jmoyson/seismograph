@@ -34,3 +34,26 @@ pnpm check:slices      # verify no cross-slice imports
 pnpm graph:slices      # regenerate docs/dependency-graph.svg
 pnpm build             # build both apps
 ```
+
+## Development with Claude Code
+
+This project includes [Claude Code skills](https://docs.anthropic.com/en/docs/claude-code/skills) that encode architecture conventions and automate feature generation.
+
+### Prerequisites
+
+Install the Superpowers plugin (recommended — provides brainstorming, TDD, debugging workflows):
+
+```bash
+claude plugins add @anthropic/claude-code-superpowers
+```
+
+### Available skills
+
+| Command | What it does |
+|---------|-------------|
+| `/onboard` | Interactive tour — architecture, conventions, dev setup |
+| `/new <description>` | Generate a feature end-to-end (types → backend → frontend) |
+| `/new-plugin <description>` | Generate a Superset visualization plugin |
+| `/check` | Verify compilation, slice isolation, tests, conventions |
+
+Example: `/new ranking of most active seismic regions` generates shared types, a backend query slice, a frontend panel, and verifies everything compiles.
