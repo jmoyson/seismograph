@@ -84,8 +84,8 @@ When asked to add a feature, use `/new`. When asked about the project, suggest `
 
 Install the [Superpowers plugin](https://github.com/anthropics/claude-code-superpowers) for brainstorming, TDD, debugging, and plan execution workflows:
 
-````bash
+```bash
 claude plugins add @anthropic/claude-code-superpowers
-````
+```
 
 A session-start hook will remind you if it's not installed.

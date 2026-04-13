@@ -334,12 +334,16 @@ export class SliceNameModule {}
 
 ### Scheduler
 
+If the worker needs to run initial work on startup (like `sync-earthquakes` does with `seedHistory()`), inject the service and implement `OnModuleInit`. See `sync-earthquakes.scheduler.ts` for the full pattern.
+
 ```typescript
 // <slice-name>.scheduler.ts
 import { Injectable, Logger } from '@nestjs/common';
 import { Cron } from '@nestjs/schedule';
 import { InjectQueue } from '@nestjs/bullmq';
 import { Queue } from 'bullmq';
+// If startup work needed: import { OnModuleInit } from '@nestjs/common';
+// and inject SliceNameService in constructor
 
 @Injectable()
 export class SliceNameScheduler {
